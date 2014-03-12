@@ -1,0 +1,24 @@
+#eclipse
+/bin
+/.settings
+/.classpath
+
+#idea
+/.idea
+*.iml
+
+#gradle
+/build
+/.gradle
+
+#occupational hazards
+/eclipse/
+/repo/
+/buildSrc
+
+# Windows shit
+Thumbs.db
+Desktop.ini
+
+# Mac crap
+.DS_Store

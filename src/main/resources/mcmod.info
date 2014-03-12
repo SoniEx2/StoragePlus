@@ -1,0 +1,19 @@
+[
+    {
+        "modid": "StoragePlus",
+        "name": "Storage+",
+        "description": "",
+        "version": "${version}.${build} ${codebase}",
+        "mcversion": "${mcversion}",
+        "url": "",
+        "updateUrl": "",
+        "authorList": [ "SoniEx2" ],
+        "credits": "",
+        "logoFile": "",
+        "screenshots": [],
+        "parent": "",
+        "requiredMods": [ "Forge" ],
+        "dependencies": [ "Forge" ],
+        "dependants": []
+    }
+]
