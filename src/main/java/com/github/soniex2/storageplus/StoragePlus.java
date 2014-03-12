@@ -2,13 +2,14 @@ package com.github.soniex2.storageplus;
 
 import net.minecraftforge.common.MinecraftForge;
 
+import org.apache.logging.log4j.Logger;
+
 import com.github.soniex2.storageplus.blocks.StoragePlusBlocks;
 import com.github.soniex2.storageplus.event.EventListener;
 import com.github.soniex2.storageplus.items.StoragePlusItems;
 import com.github.soniex2.storageplus.proxy.CommonProxy;
 import com.github.soniex2.storageplus.tileentities.StoragePlusTileEntities;
 
-import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.common.Mod;
 import cpw.mods.fml.common.Mod.EventHandler;
 import cpw.mods.fml.common.Mod.Instance;
@@ -26,6 +27,7 @@ public class StoragePlus {
 	public static StoragePlusItems items;
 	public static StoragePlusBlocks blocks;
 	public static StoragePlusTileEntities tileEntities;
+	public static Logger log;
 
 	@SidedProxy(modId = "storageplus", clientSide = "com.github.soniex2.storageplus.proxy.CommonProxy", serverSide = "com.github.soniex2.storageplus.proxy.ClientProxy")
 	public static CommonProxy proxy;
@@ -34,7 +36,8 @@ public class StoragePlus {
 
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
-		FMLLog.info("Loading Storage+");
+		log = event.getModLog();
+		log.info("Loading Storage+");
 		creativeTab = new StoragePlusCreativeTab();
 		blocks = new StoragePlusBlocks();
 		tileEntities = new StoragePlusTileEntities();
@@ -62,6 +65,6 @@ public class StoragePlus {
 		tileEntities.postInit(event);
 		items.postInit(event);
 		proxy.postInit(event);
-		FMLLog.info("Done!");
+		log.info("Done!");
 	}
 }

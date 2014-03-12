@@ -6,7 +6,7 @@ import net.minecraft.item.Item;
 public class StoragePlusCreativeTab extends CreativeTabs {
 
 	public StoragePlusCreativeTab() {
-		super("storageplus.tab");
+		super("storageplus.name");
 	}
 
 	@Override
