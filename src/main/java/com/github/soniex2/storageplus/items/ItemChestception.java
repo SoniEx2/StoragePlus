@@ -33,7 +33,7 @@ public class ItemChestception extends Item {
 		if (!hasContainerItem(is)) {
 			return null;
 		}
-		return new ItemStack(this, 1, is.getItemDamage() - 1);
+		return new ItemStack(this, 1, is.getItemDamage() + 1);
 	}
 
 }
