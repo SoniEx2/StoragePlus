@@ -20,7 +20,7 @@ import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 @Mod(modid = "storageplus", name = "Storage+", version = Version.MOD_VERSION, dependencies = "required-after:Forge")
 public class StoragePlus {
 
-	@Instance("StoragePlus")
+	@Instance("storageplus")
 	public static StoragePlus instance;
 
 	public static StoragePlusItems items;
