@@ -1,6 +1,7 @@
 package com.github.soniex2.storageplus.blocks;
 
-import net.minecraft.item.ItemBlock;
+import com.github.soniex2.storageplus.items.ItemBlockCrate;
+
 import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPostInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
@@ -12,7 +13,7 @@ public class StoragePlusBlocks {
 
 	public void preInit(FMLPreInitializationEvent event) {
 		crate = new BlockCrate();
-		GameRegistry.registerBlock(crate, ItemBlock.class, "crate", "storageplus");
+		GameRegistry.registerBlock(crate, ItemBlockCrate.class, "crate", "storageplus");
 	}
 
 	public void init(FMLInitializationEvent event) {

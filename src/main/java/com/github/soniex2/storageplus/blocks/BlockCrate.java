@@ -1,16 +1,22 @@
 package com.github.soniex2.storageplus.blocks;
 
+import java.util.List;
+
+import net.minecraft.block.BlockContainer;
+import net.minecraft.block.material.Material;
+import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.IIcon;
+import net.minecraft.world.World;
+
 import com.github.soniex2.storageplus.StoragePlus;
 import com.github.soniex2.storageplus.tileentities.TileEntityCrate;
 
 import cpw.mods.fml.relauncher.Side;
 import cpw.mods.fml.relauncher.SideOnly;
-import net.minecraft.block.BlockContainer;
-import net.minecraft.block.material.Material;
-import net.minecraft.client.renderer.texture.IIconRegister;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.IIcon;
-import net.minecraft.world.World;
 
 // TODO implement this
 public class BlockCrate extends BlockContainer {
@@ -37,7 +43,7 @@ public class BlockCrate extends BlockContainer {
 	public void registerBlockIcons(IIconRegister register) {
 		icons[0] = register.registerIcon("storageplus:crate_oak");
 		icons[1] = register.registerIcon("storageplus:crate_spruce");
-		icons[2] = register.registerIcon("storageplus:crate_brich");
+		icons[2] = register.registerIcon("storageplus:crate_birch");
 		icons[3] = register.registerIcon("storageplus:crate_jungle");
 		icons[4] = register.registerIcon("storageplus:crate_acacia");
 		icons[5] = register.registerIcon("storageplus:crate_darkoak");
@@ -50,5 +56,13 @@ public class BlockCrate extends BlockContainer {
 			return icons[0];
 		}
 		return icons[metadata];
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@Override
+	public void getSubBlocks(Item item, CreativeTabs tab, List itemStacks) {
+		for (int i = 0; i < icons.length; i++) {
+			itemStacks.add(new ItemStack(item, 1, i));
+		}
 	}
 }
