@@ -34,8 +34,7 @@ public class EventListener {
 						1, 0);
 				ChestceptionCraftEvent craftEvent = new ChestceptionCraftEvent(
 						stack, event.world, event.x, event.y, event.z, chest);
-				MinecraftForge.EVENT_BUS.post(craftEvent);
-				if (craftEvent.isCanceled()) {
+				if (MinecraftForge.EVENT_BUS.post(craftEvent)) {
 					return;
 				}
 				for (int i = 0; i < chest.getSizeInventory(); i++) {
