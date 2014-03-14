@@ -1,5 +1,7 @@
 package com.github.soniex2.storageplus.event;
 
+import com.github.soniex2.storageplus.StoragePlus;
+
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
@@ -28,7 +30,8 @@ public class EventListener {
 						return;
 					}
 				}
-				ItemStack stack = null;
+				ItemStack stack = new ItemStack(StoragePlus.items.chestception,
+						1, 0);
 				ChestceptionCraftEvent craftEvent = new ChestceptionCraftEvent(
 						stack, event.world, event.x, event.y, event.z, chest);
 				MinecraftForge.EVENT_BUS.post(craftEvent);
