@@ -27,10 +27,15 @@ public class BlockCrate extends BlockContainer {
 		super(Material.wood);
 		this.setBlockName("storageplus.crate");
 		this.setBlockTextureName("storageplus:crate");
-		this.setResistance(0.5F);
-		this.setHardness(1.5F);
+		this.setResistance(5.0F);
+		this.setHardness(2.0F);
 		this.setCreativeTab(StoragePlus.creativeTab);
 		this.setStepSound(soundTypeWood);
+	}
+	
+	@Override
+	public int damageDropped(int metadata) {
+		return metadata;
 	}
 
 	@Override

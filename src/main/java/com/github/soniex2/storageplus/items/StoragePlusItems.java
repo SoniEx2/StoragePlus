@@ -1,5 +1,6 @@
 package com.github.soniex2.storageplus.items;
 
+import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.oredict.ShapedOreRecipe;
@@ -21,10 +22,14 @@ public class StoragePlusItems {
 	}
 
 	public void init(FMLInitializationEvent event) {
-		GameRegistry.addRecipe(new ShapedOreRecipe(new ItemStack(
-				StoragePlus.blocks.crate), "#/#", "/@/", "#/#", '#',
-				"plankWood", '/', "stickWood", '@', new ItemStack(chestception,
-						1, OreDictionary.WILDCARD_VALUE)));
+		for (int m = 0; m < 6; m++) {
+			GameRegistry
+					.addRecipe(new ShapedOreRecipe(new ItemStack(
+							StoragePlus.blocks.crate, 1, m), "#/#", "/@/",
+							"#/#", '#', new ItemStack(Blocks.planks, 1, m),
+							'/', "stickWood", '@', new ItemStack(chestception,
+									1, OreDictionary.WILDCARD_VALUE)));
+		}
 	}
 
 	public void postInit(FMLPostInitializationEvent event) {
