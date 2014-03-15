@@ -13,7 +13,7 @@ public class ItemChestception extends Item {
 		this.setUnlocalizedName("storageplus.chestception");
 		this.setNoRepair();
 		this.setMaxStackSize(1);
-		this.setMaxDamage(255);
+		this.setMaxDamage(4095);
 	}
 
 	@Override
