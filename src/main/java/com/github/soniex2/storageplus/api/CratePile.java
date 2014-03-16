@@ -1,5 +1,7 @@
 package com.github.soniex2.storageplus.api;
 
+import com.github.soniex2.storageplus.tileentities.TileEntityCrate;
+
 import net.minecraft.item.ItemStack;
 
 public class CratePile {
@@ -16,6 +18,11 @@ public class CratePile {
 		// being able to display items on the GUI. then use crazy shit to suck
 		// items back or something.
 		return null;
+	}
+
+	public void add(TileEntityCrate tileEntityCrate) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

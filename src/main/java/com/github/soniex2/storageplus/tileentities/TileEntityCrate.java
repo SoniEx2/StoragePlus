@@ -7,6 +7,9 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.NetworkManager;
+import net.minecraft.network.Packet;
+import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
@@ -29,6 +32,11 @@ public class TileEntityCrate extends TileEntity implements IInventory {
 	public TileEntityCrate() {
 	}
 
+	/**
+	 * Returns the internal {@link CratePile}.
+	 * 
+	 * @return the internal CratePile
+	 */
 	public CratePile getCratePile() {
 		return crateStack;
 	}
@@ -131,8 +139,24 @@ public class TileEntityCrate extends TileEntity implements IInventory {
 	}
 
 	@Override
+	public Packet getDescriptionPacket() {
+		NBTTagCompound nbt = new NBTTagCompound();
+		writeToNBT(nbt);
+		return new S35PacketUpdateTileEntity(xCoord, yCoord, zCoord, 0, nbt);
+	}
+
+	@Override
+	public void onDataPacket(NetworkManager net, S35PacketUpdateTileEntity pkt) {
+		super.onDataPacket(net, pkt);
+		NBTTagCompound nbt = pkt.func_148857_g();
+		readFromNBT(nbt);
+	}
+
+	@Override
 	public void updateEntity() {
 		super.updateEntity();
+		if (worldObj.isRemote)
+			return;
 		// Run 2 times per second because ItemStack construction is expensive
 		if (ticksSinceLastUpdate >= 10) {
 			for (int i = 0; i < Math.min(inventory.length,
@@ -140,19 +164,43 @@ public class TileEntityCrate extends TileEntity implements IInventory {
 				if (!ItemStack.areItemStacksEqual(inventory[i],
 						originalInventory[i])) {
 					this.markDirty();
-					StoragePlus.log.warn("Please forward the following code to SoniEx2: mkdirt");
+					StoragePlus.log
+							.warn(String
+									.format("Some stupid machine is interacting with crate at %s,%s,%s on dimension %s.",
+											this.xCoord, this.yCoord,
+											this.zCoord,
+											this.worldObj.provider.dimensionId));
 				}
 			}
 		} else {
 			ticksSinceLastUpdate++;
 		}
+		for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
+			TileEntity te = this.worldObj.getTileEntity(this.xCoord
+					+ dir.offsetX, this.yCoord + dir.offsetY, this.zCoord
+					+ dir.offsetZ);
+			if (te != null && te instanceof TileEntityCrate) {
+				if (this.crateStack == ((TileEntityCrate) te).crateStack) {
+					// TODO set connected
+				}
+			}
+		}
 	}
 
 	public void setupCrate(EntityPlayer player, World world, int x, int y,
 			int z, int side, int metadata) {
+		if (world.isRemote)
+			return;
 		// TODO write this.
-		ForgeDirection sideClicked = ForgeDirection.getOrientation(side).getOpposite();
+		ForgeDirection sideClicked = ForgeDirection.getOrientation(side);
 		ForgeDirection oppositeSide = sideClicked.getOpposite();
+		TileEntity te = world.getTileEntity(this.xCoord + oppositeSide.offsetX,
+				this.yCoord + oppositeSide.offsetY, this.zCoord
+						+ oppositeSide.offsetZ);
+		if (te != null && te instanceof TileEntityCrate) {
+			((TileEntityCrate) te).crateStack.add(this);
+			this.crateStack = ((TileEntityCrate) te).crateStack;
+		}
 	}
 
 }
