@@ -1,5 +1,6 @@
 package com.github.soniex2.storageplus.tileentities;
 
+import com.github.soniex2.storageplus.StoragePlus;
 import com.github.soniex2.storageplus.api.CratePile;
 
 import net.minecraft.entity.player.EntityPlayer;
@@ -8,6 +9,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.ForgeDirection;
 
 // TODO implement this
 // How this'll work:
@@ -138,6 +140,7 @@ public class TileEntityCrate extends TileEntity implements IInventory {
 				if (!ItemStack.areItemStacksEqual(inventory[i],
 						originalInventory[i])) {
 					this.markDirty();
+					StoragePlus.log.warn("Please forward the following code to SoniEx2: mkdirt");
 				}
 			}
 		} else {
@@ -148,6 +151,8 @@ public class TileEntityCrate extends TileEntity implements IInventory {
 	public void setupCrate(EntityPlayer player, World world, int x, int y,
 			int z, int side, int metadata) {
 		// TODO write this.
+		ForgeDirection sideClicked = ForgeDirection.getOrientation(side).getOpposite();
+		ForgeDirection oppositeSide = sideClicked.getOpposite();
 	}
 
 }
