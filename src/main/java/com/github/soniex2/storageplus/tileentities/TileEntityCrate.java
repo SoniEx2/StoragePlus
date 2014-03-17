@@ -175,14 +175,19 @@ public class TileEntityCrate extends TileEntity implements IInventory {
 		} else {
 			ticksSinceLastUpdate++;
 		}
-		// Not sure if this is really needed...
+		// TODO check connected directions for a null crateStack and update ALL
+		// the crates (should only happen on world/chunk load)
 		for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
-			TileEntity te = this.worldObj.getTileEntity(this.xCoord
-					+ dir.offsetX, this.yCoord + dir.offsetY, this.zCoord
-					+ dir.offsetZ);
-			if (te != null && te instanceof TileEntityCrate) {
-				if (this.crateStack == ((TileEntityCrate) te).crateStack) {
-					// TODO set connected
+			if (this.worldObj.getBlockMetadata(this.xCoord + dir.offsetX,
+					this.yCoord + dir.offsetY, this.zCoord + dir.offsetZ) == this.worldObj
+					.getBlockMetadata(this.xCoord, this.yCoord, this.zCoord)) {
+				TileEntity tileEntity = this.worldObj.getTileEntity(this.xCoord
+						+ dir.offsetX, this.yCoord + dir.offsetY, this.zCoord
+						+ dir.offsetZ);
+				if (tileEntity != null && tileEntity instanceof TileEntityCrate) {
+					if (this.crateStack == ((TileEntityCrate) tileEntity).crateStack) {
+						// TODO set connected
+					}
 				}
 			}
 		}
@@ -203,16 +208,19 @@ public class TileEntityCrate extends TileEntity implements IInventory {
 			this.crateStack = ((TileEntityCrate) te).crateStack;
 			// Update connections
 			for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
-				TileEntity tileEntity = this.worldObj.getTileEntity(this.xCoord
-						+ dir.offsetX, this.yCoord + dir.offsetY, this.zCoord
-						+ dir.offsetZ);
-				if (tileEntity != null && tileEntity instanceof TileEntityCrate) {
-					if (this.crateStack == ((TileEntityCrate) tileEntity).crateStack) {
-						// TODO set connected
+				if (this.worldObj.getBlockMetadata(this.xCoord + dir.offsetX,
+						this.yCoord + dir.offsetY, this.zCoord + dir.offsetZ) == metadata) {
+					TileEntity tileEntity = this.worldObj.getTileEntity(
+							this.xCoord + dir.offsetX, this.yCoord
+									+ dir.offsetY, this.zCoord + dir.offsetZ);
+					if (tileEntity != null
+							&& tileEntity instanceof TileEntityCrate) {
+						if (this.crateStack == ((TileEntityCrate) tileEntity).crateStack) {
+							// TODO set connected
+						}
 					}
 				}
 			}
 		}
 	}
-
 }
