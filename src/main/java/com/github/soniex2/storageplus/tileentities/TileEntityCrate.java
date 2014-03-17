@@ -175,6 +175,7 @@ public class TileEntityCrate extends TileEntity implements IInventory {
 		} else {
 			ticksSinceLastUpdate++;
 		}
+		// Not sure if this is really needed...
 		for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
 			TileEntity te = this.worldObj.getTileEntity(this.xCoord
 					+ dir.offsetX, this.yCoord + dir.offsetY, this.zCoord
@@ -191,15 +192,26 @@ public class TileEntityCrate extends TileEntity implements IInventory {
 			int z, int side, int metadata) {
 		if (world.isRemote)
 			return;
-		// TODO write this.
 		ForgeDirection sideClicked = ForgeDirection.getOrientation(side);
 		ForgeDirection oppositeSide = sideClicked.getOpposite();
 		TileEntity te = world.getTileEntity(this.xCoord + oppositeSide.offsetX,
 				this.yCoord + oppositeSide.offsetY, this.zCoord
 						+ oppositeSide.offsetZ);
+		// Check crate
 		if (te != null && te instanceof TileEntityCrate) {
 			((TileEntityCrate) te).crateStack.add(this);
 			this.crateStack = ((TileEntityCrate) te).crateStack;
+			// Update connections
+			for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
+				TileEntity tileEntity = this.worldObj.getTileEntity(this.xCoord
+						+ dir.offsetX, this.yCoord + dir.offsetY, this.zCoord
+						+ dir.offsetZ);
+				if (tileEntity != null && tileEntity instanceof TileEntityCrate) {
+					if (this.crateStack == ((TileEntityCrate) tileEntity).crateStack) {
+						// TODO set connected
+					}
+				}
+			}
 		}
 	}
 
