@@ -1,5 +1,7 @@
 package com.github.soniex2.storageplus.tileentities;
 
+import java.util.List;
+
 import com.github.soniex2.storageplus.StoragePlus;
 import com.github.soniex2.storageplus.api.CratePile;
 
@@ -26,6 +28,8 @@ public class TileEntityCrate extends TileEntity implements IInventory {
 	/** IInventory access */
 	private ItemStack[] inventory = new ItemStack[5];
 	private ItemStack[] originalInventory = new ItemStack[5];
+
+	private boolean[] sideConnected = new boolean[ForgeDirection.VALID_DIRECTIONS.length];
 
 	private int ticksSinceLastUpdate = 0;
 
@@ -131,11 +135,17 @@ public class TileEntityCrate extends TileEntity implements IInventory {
 	@Override
 	public void writeToNBT(NBTTagCompound nbt) {
 		super.writeToNBT(nbt);
+		for (int i = 0; i < sideConnected.length; i++) {
+			nbt.setBoolean("connected" + i, sideConnected[i]);
+		}
 	}
 
 	@Override
 	public void readFromNBT(NBTTagCompound nbt) {
 		super.readFromNBT(nbt);
+		for (int i = 0; i < sideConnected.length; i++) {
+			sideConnected[i] = nbt.getBoolean("connected" + i);
+		}
 	}
 
 	@Override
@@ -157,6 +167,10 @@ public class TileEntityCrate extends TileEntity implements IInventory {
 		super.updateEntity();
 		if (worldObj.isRemote)
 			return;
+		// if (this.crateStack == null) {
+		// TODO update connected crates
+		// return;
+		// }
 		// Run 2 times per second because ItemStack construction is expensive
 		if (ticksSinceLastUpdate >= 10) {
 			for (int i = 0; i < Math.min(inventory.length,
@@ -175,8 +189,7 @@ public class TileEntityCrate extends TileEntity implements IInventory {
 		} else {
 			ticksSinceLastUpdate++;
 		}
-		// TODO check connected directions for a null crateStack and update ALL
-		// the crates (should only happen on world/chunk load)
+		boolean update = false;
 		for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
 			if (this.worldObj.getBlockMetadata(this.xCoord + dir.offsetX,
 					this.yCoord + dir.offsetY, this.zCoord + dir.offsetZ) == this.worldObj
@@ -185,11 +198,20 @@ public class TileEntityCrate extends TileEntity implements IInventory {
 						+ dir.offsetX, this.yCoord + dir.offsetY, this.zCoord
 						+ dir.offsetZ);
 				if (tileEntity != null && tileEntity instanceof TileEntityCrate) {
-					if (this.crateStack == ((TileEntityCrate) tileEntity).crateStack) {
-						// TODO set connected
+					if (this.crateStack == ((TileEntityCrate) tileEntity).crateStack
+							&& !sideConnected[dir.ordinal()]) {
+						sideConnected[dir.ordinal()] = true;
+						update = true;
+					} else if (this.crateStack != ((TileEntityCrate) tileEntity).crateStack
+							&& sideConnected[dir.ordinal()]) {
+						sideConnected[dir.ordinal()] = false;
+						update = true;
 					}
 				}
 			}
+		}
+		if (update) {
+			this.markDirty();
 		}
 	}
 
@@ -216,7 +238,7 @@ public class TileEntityCrate extends TileEntity implements IInventory {
 					if (tileEntity != null
 							&& tileEntity instanceof TileEntityCrate) {
 						if (this.crateStack == ((TileEntityCrate) tileEntity).crateStack) {
-							// TODO set connected
+							sideConnected[dir.ordinal()] = true;
 						}
 					}
 				}
