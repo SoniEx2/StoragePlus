@@ -173,6 +173,7 @@ public class TileEntityCrate extends TileEntity implements IInventory {
 		// }
 		// Run 2 times per second because ItemStack construction is expensive
 		if (ticksSinceLastUpdate >= 10) {
+			ticksSinceLastUpdate = 0;
 			for (int i = 0; i < Math.min(inventory.length,
 					originalInventory.length); i++) {
 				if (!ItemStack.areItemStacksEqual(inventory[i],
@@ -186,32 +187,55 @@ public class TileEntityCrate extends TileEntity implements IInventory {
 											this.worldObj.provider.dimensionId));
 				}
 			}
-		} else {
-			ticksSinceLastUpdate++;
-		}
-		boolean update = false;
-		for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
-			if (this.worldObj.getBlockMetadata(this.xCoord + dir.offsetX,
-					this.yCoord + dir.offsetY, this.zCoord + dir.offsetZ) == this.worldObj
-					.getBlockMetadata(this.xCoord, this.yCoord, this.zCoord)) {
-				TileEntity tileEntity = this.worldObj.getTileEntity(this.xCoord
-						+ dir.offsetX, this.yCoord + dir.offsetY, this.zCoord
-						+ dir.offsetZ);
-				if (tileEntity != null && tileEntity instanceof TileEntityCrate) {
-					if (this.crateStack == ((TileEntityCrate) tileEntity).crateStack
-							&& !sideConnected[dir.ordinal()]) {
-						sideConnected[dir.ordinal()] = true;
-						update = true;
-					} else if (this.crateStack != ((TileEntityCrate) tileEntity).crateStack
-							&& sideConnected[dir.ordinal()]) {
+			boolean update = false;
+			for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
+				if (sideConnected[dir.ordinal()]) {
+					if (this.worldObj.getBlockMetadata(this.xCoord
+							+ dir.offsetX, this.yCoord + dir.offsetY,
+							this.zCoord + dir.offsetZ) != this.worldObj
+							.getBlockMetadata(this.xCoord, this.yCoord,
+									this.zCoord)) {
 						sideConnected[dir.ordinal()] = false;
 						update = true;
+					} else {
+						TileEntity tileEntity = this.worldObj.getTileEntity(
+								this.xCoord + dir.offsetX, this.yCoord
+										+ dir.offsetY, this.zCoord
+										+ dir.offsetZ);
+						if (tileEntity == null
+								|| !(tileEntity instanceof TileEntityCrate)) {
+							sideConnected[dir.ordinal()] = false;
+							update = true;
+						} else if (this.crateStack != ((TileEntityCrate) tileEntity).crateStack) {
+							sideConnected[dir.ordinal()] = false;
+							update = true;
+						}
+					}
+				} else {
+					if (this.worldObj.getBlockMetadata(this.xCoord
+							+ dir.offsetX, this.yCoord + dir.offsetY,
+							this.zCoord + dir.offsetZ) == this.worldObj
+							.getBlockMetadata(this.xCoord, this.yCoord,
+									this.zCoord)) {
+						TileEntity tileEntity = this.worldObj.getTileEntity(
+								this.xCoord + dir.offsetX, this.yCoord
+										+ dir.offsetY, this.zCoord
+										+ dir.offsetZ);
+						if (tileEntity != null
+								&& tileEntity instanceof TileEntityCrate) {
+							if (this.crateStack == ((TileEntityCrate) tileEntity).crateStack) {
+								sideConnected[dir.ordinal()] = true;
+								update = true;
+							}
+						}
 					}
 				}
 			}
-		}
-		if (update) {
-			this.markDirty();
+			if (update) {
+				this.markDirty();
+			}
+		} else {
+			ticksSinceLastUpdate++;
 		}
 	}
 
