@@ -31,6 +31,8 @@ public class TileEntityCrate extends TileEntity implements IInventory {
 
 	private int ticksSinceLastUpdate = 0;
 
+	private boolean read = false;
+
 	public TileEntityCrate() {
 	}
 
@@ -140,6 +142,7 @@ public class TileEntityCrate extends TileEntity implements IInventory {
 
 	@Override
 	public void readFromNBT(NBTTagCompound nbt) {
+		read = true;
 		super.readFromNBT(nbt);
 		for (int i = 0; i < sideConnected.length; i++) {
 			sideConnected[i] = nbt.getBoolean("connected" + i);
@@ -184,68 +187,89 @@ public class TileEntityCrate extends TileEntity implements IInventory {
 					}
 				}
 				// TODO update inv
+			} else {
+				updateContainingBlockInfo();
 			}
-			boolean update = false;
-			for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
-				if (sideConnected[dir.ordinal()]) {
-					if (this.worldObj.getBlockMetadata(this.xCoord
-							+ dir.offsetX, this.yCoord + dir.offsetY,
-							this.zCoord + dir.offsetZ) != this.worldObj
-							.getBlockMetadata(this.xCoord, this.yCoord,
-									this.zCoord)) {
+		} else {
+			ticksSinceLastUpdate++;
+		}
+	}
+
+	private int failCounter = 0;
+
+	@Override
+	public void updateContainingBlockInfo() {
+		super.updateContainingBlockInfo();
+		if (!read) {
+			if (failCounter < 4) {
+				failCounter++;
+				return;
+			}
+			read = true; // "fuck it all"
+		}
+		boolean update = false;
+		for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
+			if (sideConnected[dir.ordinal()]) {
+				if (this.worldObj.getBlockMetadata(this.xCoord + dir.offsetX,
+						this.yCoord + dir.offsetY, this.zCoord + dir.offsetZ) != this.worldObj
+						.getBlockMetadata(this.xCoord, this.yCoord, this.zCoord)) {
+					sideConnected[dir.ordinal()] = false;
+					update = true;
+				} else {
+					TileEntity tileEntity = this.worldObj.getTileEntity(
+							this.xCoord + dir.offsetX, this.yCoord
+									+ dir.offsetY, this.zCoord + dir.offsetZ);
+					if (tileEntity == null
+							|| !(tileEntity instanceof TileEntityCrate)) {
 						sideConnected[dir.ordinal()] = false;
 						update = true;
-					} else {
-						TileEntity tileEntity = this.worldObj.getTileEntity(
-								this.xCoord + dir.offsetX, this.yCoord
-										+ dir.offsetY, this.zCoord
-										+ dir.offsetZ);
-						if (tileEntity == null
-								|| !(tileEntity instanceof TileEntityCrate)) {
-							sideConnected[dir.ordinal()] = false;
-							update = true;
-						} else if (this.crateStack == null
-								&& ((TileEntityCrate) tileEntity).crateStack == null) {
-							this.crateStack = new CratePile();
-							((TileEntityCrate) tileEntity).crateStack = this.crateStack;
-							update = true;
-						} else if (((TileEntityCrate) tileEntity).crateStack == null) {
-							((TileEntityCrate) tileEntity).crateStack = this.crateStack;
-							update = true;
-						} else if (this.crateStack == null) {
-							this.crateStack = ((TileEntityCrate) tileEntity).crateStack;
-							update = true;
-						} else if (this.crateStack != ((TileEntityCrate) tileEntity).crateStack) {
-							sideConnected[dir.ordinal()] = false;
-							update = true;
-						}
+					} else if (this.crateStack == null
+							&& ((TileEntityCrate) tileEntity).crateStack == null) {
+						this.crateStack = new CratePile();
+						((TileEntityCrate) tileEntity).crateStack = this.crateStack;
+						tileEntity.updateContainingBlockInfo();
+						update = true;
+					} else if (((TileEntityCrate) tileEntity).crateStack == null) {
+						((TileEntityCrate) tileEntity).crateStack = this.crateStack;
+						update = true;
+					} else if (this.crateStack == null) {
+						this.crateStack = ((TileEntityCrate) tileEntity).crateStack;
+						tileEntity.updateContainingBlockInfo();
+						update = true;
+					} else if (this.crateStack != ((TileEntityCrate) tileEntity).crateStack) {
+						sideConnected[dir.ordinal()] = false;
+						tileEntity.updateContainingBlockInfo();
+						update = true;
 					}
-				} else {
-					if (this.worldObj.getBlockMetadata(this.xCoord
-							+ dir.offsetX, this.yCoord + dir.offsetY,
-							this.zCoord + dir.offsetZ) == this.worldObj
-							.getBlockMetadata(this.xCoord, this.yCoord,
-									this.zCoord)) {
-						TileEntity tileEntity = this.worldObj.getTileEntity(
-								this.xCoord + dir.offsetX, this.yCoord
-										+ dir.offsetY, this.zCoord
-										+ dir.offsetZ);
-						if (tileEntity != null
-								&& tileEntity instanceof TileEntityCrate) {
-							if (this.crateStack == ((TileEntityCrate) tileEntity).crateStack) {
+				}
+			} else {
+				if (this.worldObj.getBlockMetadata(this.xCoord + dir.offsetX,
+						this.yCoord + dir.offsetY, this.zCoord + dir.offsetZ) == this.worldObj
+						.getBlockMetadata(this.xCoord, this.yCoord, this.zCoord)) {
+					TileEntity tileEntity = this.worldObj.getTileEntity(
+							this.xCoord + dir.offsetX, this.yCoord
+									+ dir.offsetY, this.zCoord + dir.offsetZ);
+					if (tileEntity != null
+							&& tileEntity instanceof TileEntityCrate) {
+						if (this.crateStack == ((TileEntityCrate) tileEntity).crateStack) {
+							if (this.crateStack != null) { // they're equal,
+															// just check
+															// for null
 								sideConnected[dir.ordinal()] = true;
+								tileEntity.updateContainingBlockInfo();
 								update = true;
 							}
 						}
 					}
 				}
 			}
-			if (update) {
-				this.markDirty();
-				// TODO how do I sync this shit?
-			}
-		} else {
-			ticksSinceLastUpdate++;
+		}
+		if (crateStack == null) { // We couldn't find a crate stack
+			this.crateStack = new CratePile(); // Just make it
+			update = true;
+		}
+		if (update) {
+			// TODO sync TileEntity data
 		}
 	}
 
@@ -253,6 +277,7 @@ public class TileEntityCrate extends TileEntity implements IInventory {
 			int z, int side, int metadata) {
 		if (world.isRemote)
 			return;
+		read = true; // Skip the whole update check thing
 		ForgeDirection sideClicked = ForgeDirection.getOrientation(side);
 		ForgeDirection oppositeSide = sideClicked.getOpposite();
 		TileEntity te = world.getTileEntity(this.xCoord + oppositeSide.offsetX,
@@ -277,6 +302,8 @@ public class TileEntityCrate extends TileEntity implements IInventory {
 					}
 				}
 			}
+		} else {
+			this.crateStack = new CratePile();
 		}
 	}
 }

@@ -10,6 +10,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
 import com.github.soniex2.storageplus.StoragePlus;
@@ -32,7 +33,7 @@ public class BlockCrate extends BlockContainer {
 		this.setCreativeTab(StoragePlus.creativeTab);
 		this.setStepSound(soundTypeWood);
 	}
-	
+
 	@Override
 	public int damageDropped(int metadata) {
 		return metadata;
@@ -41,6 +42,15 @@ public class BlockCrate extends BlockContainer {
 	@Override
 	public TileEntity createNewTileEntity(World world, int metadata) {
 		return new TileEntityCrate();
+	}
+
+	@Override
+	public void onNeighborChange(IBlockAccess world, int x, int y, int z,
+			int tileX, int tileY, int tileZ) {
+		if (world.getTileEntity(tileX, tileY, tileZ) == null
+				|| world.getTileEntity(tileX, tileY, tileZ) instanceof TileEntityCrate) {
+			world.getTileEntity(x, y, z).updateContainingBlockInfo();
+		}
 	}
 
 	@Override
