@@ -1,10 +1,5 @@
 package com.github.soniex2.storageplus.tileentities;
 
-import java.util.List;
-
-import com.github.soniex2.storageplus.StoragePlus;
-import com.github.soniex2.storageplus.api.CratePile;
-
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
@@ -15,6 +10,9 @@ import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
+
+import com.github.soniex2.storageplus.StoragePlus;
+import com.github.soniex2.storageplus.api.CratePile;
 
 // TODO implement this
 // How this'll work:
@@ -167,25 +165,25 @@ public class TileEntityCrate extends TileEntity implements IInventory {
 		super.updateEntity();
 		if (worldObj.isRemote)
 			return;
-		// if (this.crateStack == null) {
-		// TODO update connected crates
-		// return;
-		// }
 		// Run 2 times per second because ItemStack construction is expensive
 		if (ticksSinceLastUpdate >= 10) {
 			ticksSinceLastUpdate = 0;
-			for (int i = 0; i < Math.min(inventory.length,
-					originalInventory.length); i++) {
-				if (!ItemStack.areItemStacksEqual(inventory[i],
-						originalInventory[i])) {
-					this.markDirty();
-					StoragePlus.log
-							.warn(String
-									.format("Some stupid machine is interacting with crate at %s,%s,%s on dimension %s.",
-											this.xCoord, this.yCoord,
-											this.zCoord,
-											this.worldObj.provider.dimensionId));
+			if (this.crateStack != null) {
+				for (int i = 0; i < Math.min(inventory.length,
+						originalInventory.length); i++) {
+					if (!ItemStack.areItemStacksEqual(inventory[i],
+							originalInventory[i])) {
+						this.markDirty();
+						StoragePlus.log
+								.warn(String
+										.format("Some stupid machine is interacting with crate at %s,%s,%s on dimension %s.",
+												this.xCoord,
+												this.yCoord,
+												this.zCoord,
+												this.worldObj.provider.dimensionId));
+					}
 				}
+				// TODO update inv
 			}
 			boolean update = false;
 			for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
@@ -205,6 +203,17 @@ public class TileEntityCrate extends TileEntity implements IInventory {
 						if (tileEntity == null
 								|| !(tileEntity instanceof TileEntityCrate)) {
 							sideConnected[dir.ordinal()] = false;
+							update = true;
+						} else if (this.crateStack == null
+								&& ((TileEntityCrate) tileEntity).crateStack == null) {
+							this.crateStack = new CratePile();
+							((TileEntityCrate) tileEntity).crateStack = this.crateStack;
+							update = true;
+						} else if (((TileEntityCrate) tileEntity).crateStack == null) {
+							((TileEntityCrate) tileEntity).crateStack = this.crateStack;
+							update = true;
+						} else if (this.crateStack == null) {
+							this.crateStack = ((TileEntityCrate) tileEntity).crateStack;
 							update = true;
 						} else if (this.crateStack != ((TileEntityCrate) tileEntity).crateStack) {
 							sideConnected[dir.ordinal()] = false;
@@ -233,6 +242,7 @@ public class TileEntityCrate extends TileEntity implements IInventory {
 			}
 			if (update) {
 				this.markDirty();
+				// TODO how do I sync this shit?
 			}
 		} else {
 			ticksSinceLastUpdate++;
