@@ -214,6 +214,12 @@ public class TileEntityCrate extends TileEntity implements IInventory {
 	}
 
 	@Override
+	public void markDirty() {
+		// TODO update crateStack
+		super.markDirty();
+	}
+
+	@Override
 	public void updateEntity() {
 		super.updateEntity();
 		if (worldObj.isRemote)
@@ -238,6 +244,7 @@ public class TileEntityCrate extends TileEntity implements IInventory {
 												this.yCoord,
 												this.zCoord,
 												this.worldObj.provider.dimensionId));
+						break;
 					}
 				}
 				// TODO update inv
@@ -358,6 +365,26 @@ public class TileEntityCrate extends TileEntity implements IInventory {
 			}
 		} else {
 			this.crateStack = new CratePile();
+		}
+	}
+
+	@Override
+	public void onChunkUnload() {
+		super.onChunkUnload();
+		for (int i = 0; i < Math
+				.min(inventory.length, originalInventory.length); i++) {
+			if (!ItemStack.areItemStacksEqual(inventory[i],
+					originalInventory[i])) {
+				// Chunk saves only after onChunkUnload so it's safe to
+				// markDirty
+				this.markDirty();
+				StoragePlus.log
+						.warn(String
+								.format("Some stupid machine is interacting with crate at %s,%s,%s on dimension %s.",
+										this.xCoord, this.yCoord, this.zCoord,
+										this.worldObj.provider.dimensionId));
+				break;
+			}
 		}
 	}
 }
