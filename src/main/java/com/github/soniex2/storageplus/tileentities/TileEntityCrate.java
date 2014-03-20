@@ -156,6 +156,9 @@ public class TileEntityCrate extends TileEntity implements IInventory {
 		}
 
 		// TODO save crateStack stuff
+		buffer = crateStack.getRandomStackBuffer();
+		if (buffer == null)
+			return;
 		NBTTagList buf = new NBTTagList();
 		nbt.setTag("buffer", buf);
 		for (int i = 0; i < buffer.length; i++) {
@@ -181,8 +184,8 @@ public class TileEntityCrate extends TileEntity implements IInventory {
 			}
 		}
 		NBTTagList buf = nbt.getTagList("buffer", tagId);
-		if (buf == null) {
-			return; // no buffer
+		if (buf == null || buf.tagCount() == 0) {
+			return; // no buffer?
 		}
 		ArrayList<ItemStack> list = new ArrayList<ItemStack>();
 		for (int i = 0; i < buf.tagCount(); i++) {
@@ -192,7 +195,8 @@ public class TileEntityCrate extends TileEntity implements IInventory {
 				list.add(is);
 			}
 		}
-		buffer = list.toArray(new ItemStack[list.size()]);
+		buffer = list.toArray(new ItemStack[list.size()]); // Wait until next
+															// update
 	}
 
 	@Override
@@ -218,6 +222,10 @@ public class TileEntityCrate extends TileEntity implements IInventory {
 		if (ticksSinceLastUpdate >= 10) {
 			ticksSinceLastUpdate = 0;
 			if (this.crateStack != null) {
+				if (buffer != null) {
+					crateStack.addFromBuffer(buffer);
+					buffer = null;
+				}
 				for (int i = 0; i < Math.min(inventory.length,
 						originalInventory.length); i++) {
 					if (!ItemStack.areItemStacksEqual(inventory[i],

@@ -30,4 +30,14 @@ public class CratePile {
 		return false;
 	}
 
+	public ItemStack[] getRandomStackBuffer() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public void addFromBuffer(ItemStack[] buffer) {
+		// TODO Auto-generated method stub
+
+	}
+
 }
