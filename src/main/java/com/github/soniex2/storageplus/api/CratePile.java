@@ -22,7 +22,12 @@ public class CratePile {
 
 	public void add(TileEntityCrate tileEntityCrate) {
 		// TODO Auto-generated method stub
-		
+
+	}
+
+	public boolean isFull() {
+		// TODO Auto-generated method stub
+		return false;
 	}
 
 }

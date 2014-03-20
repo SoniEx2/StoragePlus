@@ -1,9 +1,13 @@
 package com.github.soniex2.storageplus.tileentities;
 
+import java.util.ArrayList;
+
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.Packet;
 import net.minecraft.network.play.server.S35PacketUpdateTileEntity;
@@ -27,6 +31,8 @@ public class TileEntityCrate extends TileEntity implements IInventory {
 	private ItemStack[] inventory = new ItemStack[5];
 	private ItemStack[] originalInventory = new ItemStack[5];
 
+	private ItemStack[] buffer;
+
 	private boolean[] sideConnected = new boolean[ForgeDirection.VALID_DIRECTIONS.length];
 
 	private int ticksSinceLastUpdate = 0;
@@ -47,11 +53,11 @@ public class TileEntityCrate extends TileEntity implements IInventory {
 
 	@Override
 	public int getSizeInventory() {
-		return inventory.length;
+		return crateStack.isFull() ? inventory.length - 1 : inventory.length;
 	}
 
 	private boolean isOutOfBounds(int slot) {
-		return slot >= inventory.length || slot < 0;
+		return slot >= getSizeInventory() || slot < 0;
 	}
 
 	@Override
@@ -68,7 +74,17 @@ public class TileEntityCrate extends TileEntity implements IInventory {
 			return null;
 		}
 		ItemStack is = null;
-
+		if (inventory[slot] != null) {
+			if (inventory[slot].stackSize > count) {
+				is = inventory[slot];
+				inventory[slot] = null;
+			} else if (inventory[slot].stackSize <= count) {
+				is = inventory[slot].splitStack(count);
+				if (inventory[slot].stackSize <= 0) {
+					inventory[slot] = null;
+				}
+			}
+		}
 		this.markDirty();
 		return is;
 	}
@@ -138,6 +154,15 @@ public class TileEntityCrate extends TileEntity implements IInventory {
 		for (int i = 0; i < sideConnected.length; i++) {
 			nbt.setBoolean("connected" + i, sideConnected[i]);
 		}
+
+		// TODO save crateStack stuff
+		NBTTagList buf = new NBTTagList();
+		nbt.setTag("buffer", buf);
+		for (int i = 0; i < buffer.length; i++) {
+			if (buffer[i] != null) {
+				buf.appendTag(buffer[i].writeToNBT(new NBTTagCompound()));
+			}
+		}
 	}
 
 	@Override
@@ -147,6 +172,27 @@ public class TileEntityCrate extends TileEntity implements IInventory {
 		for (int i = 0; i < sideConnected.length; i++) {
 			sideConnected[i] = nbt.getBoolean("connected" + i);
 		}
+
+		// TODO read buffer
+		int tagId = 0;
+		for (int i = 0; i < NBTBase.NBTTypes.length; i++) {
+			if (NBTBase.NBTTypes[i] == "COMPOUND") {
+				tagId = i;
+			}
+		}
+		NBTTagList buf = nbt.getTagList("buffer", tagId);
+		if (buf == null) {
+			return; // no buffer
+		}
+		ArrayList<ItemStack> list = new ArrayList<ItemStack>();
+		for (int i = 0; i < buf.tagCount(); i++) {
+			ItemStack is = ItemStack.loadItemStackFromNBT(buf
+					.getCompoundTagAt(i));
+			if (is != null) {
+				list.add(is);
+			}
+		}
+		buffer = list.toArray(new ItemStack[list.size()]);
 	}
 
 	@Override
