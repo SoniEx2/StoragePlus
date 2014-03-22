@@ -1,6 +1,4 @@
-package com.github.soniex2.storageplus.api;
-
-import com.github.soniex2.storageplus.tileentities.TileEntityCrate;
+package com.github.soniex2.storageplus.api.crate;
 
 import net.minecraft.item.ItemStack;
 
@@ -20,7 +18,7 @@ public class CratePile {
 		return null;
 	}
 
-	public void add(TileEntityCrate tileEntityCrate) {
+	public void add(ICrate crate) {
 		// TODO Auto-generated method stub
 
 	}
@@ -30,7 +28,14 @@ public class CratePile {
 		return false;
 	}
 
-	public ItemStack[] getRandomStackBuffer() {
+	/**
+	 * Gets a buffer for a crate. This doesn't remove items from the CratePile.
+	 * 
+	 * @param crate
+	 *            The crate
+	 * @return The buffer.
+	 */
+	public ItemStack[] getRandomStackBuffer(ICrate crate) {
 		// TODO Auto-generated method stub
 		return null;
 	}

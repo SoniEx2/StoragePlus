@@ -16,14 +16,15 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.util.ForgeDirection;
 
 import com.github.soniex2.storageplus.StoragePlus;
-import com.github.soniex2.storageplus.api.CratePile;
+import com.github.soniex2.storageplus.api.crate.CratePile;
+import com.github.soniex2.storageplus.api.crate.ICrate;
 
 // TODO implement this
 // How this'll work:
 // Each connected TileEntity stores random items
 // You have to put them all together to get the full inv
 // etc...
-public class TileEntityCrate extends TileEntity implements IInventory {
+public class TileEntityCrate extends TileEntity implements IInventory, ICrate {
 
 	private CratePile crateStack;
 
@@ -156,7 +157,7 @@ public class TileEntityCrate extends TileEntity implements IInventory {
 		}
 
 		// TODO save crateStack stuff
-		buffer = crateStack.getRandomStackBuffer();
+		buffer = crateStack.getRandomStackBuffer(this);
 		if (buffer == null)
 			return;
 		NBTTagList buf = new NBTTagList();
