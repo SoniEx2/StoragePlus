@@ -48,6 +48,7 @@ public class TileEntityCrate extends TileEntity implements IInventory, ICrate {
 	 * 
 	 * @return the internal CratePile
 	 */
+	@Override
 	public CratePile getCratePile() {
 		return crateStack;
 	}
@@ -157,7 +158,7 @@ public class TileEntityCrate extends TileEntity implements IInventory, ICrate {
 		}
 
 		// TODO save crateStack stuff
-		buffer = crateStack.getRandomStackBuffer(this);
+		buffer = crateStack.getBufferForCrate(this);
 		if (buffer == null)
 			return;
 		NBTTagList buf = new NBTTagList();

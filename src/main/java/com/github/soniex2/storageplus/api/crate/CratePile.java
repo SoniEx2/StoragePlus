@@ -23,23 +23,37 @@ public class CratePile {
 
 	}
 
+	/**
+	 * Returns true if this CratePile is full.
+	 * 
+	 * @return <code>true</code> if this CratePile is full, <code>false</code>
+	 *         otherwise
+	 */
 	public boolean isFull() {
 		// TODO Auto-generated method stub
 		return false;
 	}
 
 	/**
-	 * Gets a buffer for a crate. This doesn't remove items from the CratePile.
+	 * Gets the buffer for a crate. This doesn't remove items from the
+	 * CratePile.
 	 * 
 	 * @param crate
 	 *            The crate
 	 * @return The buffer.
 	 */
-	public ItemStack[] getRandomStackBuffer(ICrate crate) {
+	public ItemStack[] getBufferForCrate(ICrate crate) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
+	/**
+	 * Adds a buffer to this CratePile. The buffer is randomly distributed to
+	 * this pile's crates.
+	 * 
+	 * @param buffer
+	 *            The buffer
+	 */
 	public void addFromBuffer(ItemStack[] buffer) {
 		// TODO Auto-generated method stub
 
