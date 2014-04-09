@@ -11,7 +11,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:1.1-SNAPSHOT'
+        classpath 'net.minecraftforge.gradle:ForgeGradle:1.2-SNAPSHOT'
     }
 }
 
@@ -30,7 +30,8 @@ group = "com.github.soniex2.storageplus" // http://maven.apache.org/guides/mini/
 archivesBaseName = "storageplus"
 
 minecraft {
-    version = "1.7.2-10.12.0.1046"
+    version = "1.7.2-10.12.0.1054"
+    assetDir = "eclipse/assets"
     replace '@VERSION@', project.version
     replace '@MC_VERSION@', version
     replace '@CODEBASE@', project.codebase_id

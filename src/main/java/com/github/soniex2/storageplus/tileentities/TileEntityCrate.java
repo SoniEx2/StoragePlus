@@ -231,7 +231,7 @@ public class TileEntityCrate extends TileEntity implements IInventory, ICrate {
 			ticksSinceLastUpdate = 0;
 			if (this.crateStack != null) {
 				if (buffer != null) {
-					crateStack.addFromBuffer(buffer);
+					crateStack.insertFromBuffer(buffer);
 					buffer = null;
 				}
 				for (int i = 0; i < Math.min(inventory.length,
