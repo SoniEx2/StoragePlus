@@ -226,10 +226,11 @@ public class TileEntityCrate extends TileEntity implements IInventory, ICrate {
 		super.updateEntity();
 		if (worldObj.isRemote)
 			return;
-		// Run 2 times per second because ItemStack construction is expensive
-		if (ticksSinceLastUpdate >= 10) {
-			ticksSinceLastUpdate = 0;
-			if (this.crateStack != null) {
+		if (this.crateStack != null) {
+			// Run 2 times per second because ItemStack construction is
+			// expensive
+			if (ticksSinceLastUpdate >= 10) {
+				ticksSinceLastUpdate = 0;
 				if (buffer != null) {
 					crateStack.insertFromBuffer(buffer);
 					buffer = null;
@@ -251,10 +252,10 @@ public class TileEntityCrate extends TileEntity implements IInventory, ICrate {
 				}
 				// TODO update inv
 			} else {
-				updateContainingBlockInfo();
+				ticksSinceLastUpdate++;
 			}
 		} else {
-			ticksSinceLastUpdate++;
+			updateContainingBlockInfo();
 		}
 	}
 
