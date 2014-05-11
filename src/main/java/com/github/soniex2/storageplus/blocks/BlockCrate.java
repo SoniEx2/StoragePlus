@@ -12,6 +12,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.ForgeDirection;
 
 import com.github.soniex2.storageplus.StoragePlus;
 import com.github.soniex2.storageplus.tileentities.TileEntityCrate;
@@ -47,9 +48,35 @@ public class BlockCrate extends BlockContainer {
 	@Override
 	public void onNeighborChange(IBlockAccess world, int x, int y, int z,
 			int tileX, int tileY, int tileZ) {
-		if (world.getTileEntity(tileX, tileY, tileZ) == null
-				|| world.getTileEntity(tileX, tileY, tileZ) instanceof TileEntityCrate) {
-			world.getTileEntity(x, y, z).updateContainingBlockInfo();
+		int offX = tileX - x;
+		int offY = tileY - y;
+		int offZ = tileZ - z;
+		ForgeDirection dir = ForgeDirection.UNKNOWN;
+		for (ForgeDirection d : ForgeDirection.VALID_DIRECTIONS) {
+			if (d.offsetX == offX && d.offsetY == offY && d.offsetZ == offZ) {
+				dir = d;
+				break;
+			}
+		}
+		if (dir == ForgeDirection.UNKNOWN) {
+			// ???
+			return;
+		}
+		TileEntityCrate thisCrate = (TileEntityCrate) world.getTileEntity(x, y,
+				z);
+		TileEntity another = world.getTileEntity(tileX, tileY, tileZ);
+		if (thisCrate.sideConnected[dir.ordinal()]) {
+			if (another == null
+					&& (world.getBlock(tileX, tileY, tileZ) instanceof BlockCrate)) {
+				thisCrate.updateContainingBlockInfo();
+				thisCrate.markDirty();
+			} else if (another instanceof TileEntityCrate) {
+				if (((TileEntityCrate) another).getCratePile() == null) {
+					thisCrate.updateContainingBlockInfo();
+					thisCrate.markDirty();
+				}
+			}
+
 		}
 	}
 

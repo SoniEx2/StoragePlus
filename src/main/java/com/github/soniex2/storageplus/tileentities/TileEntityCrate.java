@@ -34,7 +34,7 @@ public class TileEntityCrate extends TileEntity implements IInventory, ICrate {
 
 	private ItemStack[] buffer;
 
-	private boolean[] sideConnected = new boolean[ForgeDirection.VALID_DIRECTIONS.length];
+	public final boolean[] sideConnected = new boolean[ForgeDirection.VALID_DIRECTIONS.length];
 
 	private int ticksSinceLastUpdate = 0;
 
@@ -270,6 +270,13 @@ public class TileEntityCrate extends TileEntity implements IInventory, ICrate {
 			}
 			read = true; // "fuck it all"
 		}
+		NBTTagCompound tag = null;
+		if (this.crateStack != null) {
+			tag = new NBTTagCompound();
+			this.writeToNBT(tag);
+			this.crateStack.remove(this);
+			this.crateStack = null;
+		}
 		boolean update = false;
 		for (ForgeDirection dir : ForgeDirection.VALID_DIRECTIONS) {
 			if (sideConnected[dir.ordinal()]) {
@@ -332,7 +339,9 @@ public class TileEntityCrate extends TileEntity implements IInventory, ICrate {
 			update = true;
 		}
 		if (update) {
-			// TODO sync TileEntity data
+			if (crateStack != null && tag != null) {
+				this.readFromNBT(tag);
+			}
 		}
 	}
 

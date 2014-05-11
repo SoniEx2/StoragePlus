@@ -112,4 +112,8 @@ public class CratePile {
 		return InsertStatus.SUCCESS;
 	}
 
+	public void remove(ICrate crate) {
+		map.remove(crate);
+	}
+
 }
