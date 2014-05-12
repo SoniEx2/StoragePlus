@@ -8,4 +8,12 @@ public interface ICrate {
 	 * @return the internal CratePile
 	 */
 	CratePile getCratePile();
+	
+	/**
+	 * Sets the internal CratePile.
+	 * 
+	 * @param pile The new crate pile.
+	 * @return The old crate pile.
+	 */
+	CratePile setCratePile(CratePile pile);
 }

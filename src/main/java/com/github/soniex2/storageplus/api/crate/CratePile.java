@@ -3,6 +3,11 @@ package com.github.soniex2.storageplus.api.crate;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+
+import org.apache.logging.log4j.Level;
+
+import com.github.soniex2.storageplus.StoragePlus;
+
 import net.minecraft.item.ItemStack;
 
 public class CratePile {
@@ -113,7 +118,12 @@ public class CratePile {
 	}
 
 	public void remove(ICrate crate) {
-		map.remove(crate);
+		if (map.containsKey(crate)) {
+			map.remove(crate);
+			crate.setCratePile(null);
+		} else {
+			StoragePlus.log.log(Level.ERROR, "Crate not in stack: %s", crate);
+		}
 	}
 
 }

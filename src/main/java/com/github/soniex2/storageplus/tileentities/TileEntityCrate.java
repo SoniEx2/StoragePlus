@@ -52,6 +52,13 @@ public class TileEntityCrate extends TileEntity implements IInventory, ICrate {
 	public CratePile getCratePile() {
 		return crateStack;
 	}
+	
+	@Override
+	public CratePile setCratePile(CratePile pile) {
+		CratePile p = this.crateStack;
+		this.crateStack = pile;
+		return p;
+	}
 
 	@Override
 	public int getSizeInventory() {
