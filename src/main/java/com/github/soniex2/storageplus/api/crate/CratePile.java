@@ -125,5 +125,9 @@ public class CratePile {
 			StoragePlus.log.log(Level.ERROR, "Crate not in stack: %s", crate);
 		}
 	}
+	
+	public boolean contains(ICrate crate) {
+		return map.containsKey(crate);
+	}
 
 }
